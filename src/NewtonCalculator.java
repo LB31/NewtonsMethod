@@ -1,29 +1,46 @@
+
 import java.util.Arrays;
 
 public class NewtonCalculator {
 
 	private double startX;
-	private double[] functionA = {-1, -1, 0, 0, 0, 0, 1};
-	private double[] test = {0,0,1};
+	private double[] functionA = { -1, -1, 0, 0, 0, 0, 1 };
+	private double[] functionC = { 2, -2, 0, 1 };
+	private double[] test = { -8, 0, 1 };
 	private double endX;
 	private int newtonRuns = 0;
 
 	public NewtonCalculator() {
 
-		endX = applyNewtonMethod(functionA);
+		endX = applyNewtonMethod(functionC);
+		// The zero point
 		System.out.println(endX);
+		// speed of convergence
 		System.out.println(newtonRuns);
-		System.out.println(calculateYTest(functionA, endX));
-		System.out.println(Math.pow(endX, 6));
+		// http://stackoverflow.com/a/20937683 print double value without
+		// scientific notation
+		// Test if you get a zero point back
+		System.out.printf("%.9f", calculateY(functionC, endX));
+		// The function
+		System.out.println(Arrays.toString(functionC));
 
-		
-//		double[] back = derivation(functionA);
-		System.out.println(Arrays.toString(functionA));
-//		System.out.println(calculateY(derivation(functionA), 4));
-//		calculateStartX(test, 10);
-//		System.out.println(startX);
 	}
 
+	// f(x)
+	public double calculateY(double[] function, double inputX) {
+		double resultY = 0;
+
+		for (int i = 0; i < function.length; i++) {
+			resultY += function[i] * Math.pow(inputX, i);
+
+			// resultY = roundToFive(resultY);
+
+		}
+
+		return resultY;
+	}
+
+	// f'(x)
 	public double[] derivation(double[] function) {
 		double[] derivation = new double[function.length - 1];
 		for (int i = 1; i < function.length; i++) {
@@ -33,29 +50,7 @@ public class NewtonCalculator {
 		return derivation;
 	}
 
-	public double calculateY(double[] function, double inputX) {
-		double resultY = 0;
-//		System.out.println(function[function.length-1] * Math.pow(inputX, 6));
-		for (int i = 0; i < function.length; i++) {
-			resultY += function[i] * Math.pow(inputX, i);
-//			System.out.println(resultY + " " + i);
-		}
-
-		return resultY;
-	}
-
-	
-	public double calculateYTest(double[] function, double inputX) {
-		double resultY = 0;
-//		System.out.println(function[function.length-1] * Math.pow(inputX, 6));
-		for (int i = 0; i < function.length; i++) {
-			resultY += function[i] * Math.pow(inputX, i);
-			System.out.println(resultY + " " + i);
-		}
-
-		return resultY;
-	}
-	
+	// X0
 	public void calculateStartX(double[] function, int runLimit) {
 		double startValue = 0;
 		double previousYValue = calculateY(function, -runLimit);
@@ -79,32 +74,33 @@ public class NewtonCalculator {
 		startX = startValue;
 	}
 
-	
-	
-	
-	public double applyNewtonMethod(double[] function){
+	// x0 - f(x0) / f'(x0)
+	public double applyNewtonMethod(double[] function) {
 		calculateStartX(function, 10);
 		double zeroPoint;
 		double previousStart;
 		double currentStart = startX;
-		
+
 		double leftControl;
 		double rightControl;
-		do{
+		do {
 			previousStart = currentStart;
-			currentStart = currentStart - calculateY(function, currentStart) / calculateY(derivation(function), currentStart);
-			leftControl = (double) Math.round(previousStart * 100000) / 100000;
+			// Newton's method
+			currentStart = currentStart
+					- calculateY(function, currentStart) / calculateY(derivation(function), currentStart);
 
-			rightControl = (double) Math.round(currentStart * 100000) / 100000;
+			leftControl = roundToFive(previousStart);
+			rightControl = roundToFive(currentStart);
 			newtonRuns++;
-		} while(leftControl != rightControl);
-		
-		
-		return currentStart;
+		} while (leftControl != rightControl);
+
+		return roundToFive(currentStart);
 	}
-	
-	
-	
+
+	private double roundToFive(double resultY) {
+		return (double) Math.round(resultY * 100000) / 100000;
+	}
+
 	public static void main(String[] args) {
 		new NewtonCalculator();
 
